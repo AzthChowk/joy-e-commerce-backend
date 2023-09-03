@@ -54,8 +54,8 @@ const productSchema = new mongoose.Schema({
   },
   size: {
     type: String,
-    minlength: 2,
-    maxlength: 55,
+    minlength: 1,
+    maxlength: 10,
     trim: true,
   },
   quantity: {
