@@ -7,6 +7,7 @@ import userRoutes from "./config/user/user-route.js";
 import productRoutes from "./config/product/product-route.js";
 import reviewRoutes from "./config/review/review-route.js";
 import orderRoutes from "./config/order/order.route.js";
+import cartRoutes from "./config/cart/cart-route.js";
 
 import cors from "cors";
 
@@ -52,6 +53,9 @@ app.use(reviewRoutes);
 
 //Order Routes
 app.use(orderRoutes);
+
+//Cart Routes
+app.use(cartRoutes);
 
 const PORT = process.env.PORT || 9000;
 

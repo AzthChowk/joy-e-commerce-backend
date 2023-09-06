@@ -28,10 +28,31 @@ router.post(
 );
 
 // Get Reviews
-router.get("/product/reviews", async (req, res) => {
+router.post("/product/reviews", isBuyer, async (req, res) => {
   try {
-    const reviewsList = await Review.find({});
-    return res.status(200).send(reviewsList);
+    const usersReviewsList = await Review.aggregate([
+      {
+        $match: { reviewer: req.userInfo._id },
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "productId",
+          foreignField: "_id",
+          as: "userReviewLookupResult",
+        },
+      },
+      {
+        $project: {
+          productId: { $first: "$userReviewLookupResult._id" },
+          productName: { $first: "$userReviewLookupResult.productName" },
+          productImage: { $first: "$userReviewLookupResult.imageUrl" },
+          review: 1,
+          date: 1,
+        },
+      },
+    ]);
+    return res.status(200).send(usersReviewsList);
   } catch (error) {
     return res.status(400).send({ success: false, message: error.message });
   }
@@ -69,6 +90,8 @@ router.get(
         },
         {
           $project: {
+            _id: 1,
+            productId: { $first: "$productLookupResult._id" },
             productName: { $first: "$productLookupResult.productName" },
             reviewerFName: { $first: "$userLookupResult.firstName" },
             reviewerLName: { $first: "$userLookupResult.lastName" },

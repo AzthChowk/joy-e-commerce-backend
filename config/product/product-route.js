@@ -33,9 +33,26 @@ router.post("/product/add", isSeller, async (req, res) => {
 
 //get all products
 
-router.get("/products", async (req, res) => {
-  const productList = await Product.find({});
-  res.status(200).send(productList);
+router.post("/products", async (req, res) => {
+  const query = req.body;
+  const skip = (query.page - 1) * query.limit;
+  console.log(skip);
+  console.log(query.limit);
+  const productList = await Product.aggregate([
+    {
+      $match: {},
+    },
+    {
+      $skip: skip,
+    },
+    {
+      $limit: query.limit,
+    },
+    {
+      $sort: { addDate: -1 },
+    },
+  ]);
+  return res.status(200).send(productList);
 });
 
 //get a product details - Guest / Buyer
@@ -52,24 +69,15 @@ router.get("/product/details/:id", checkMongoId, async (req, res) => {
 });
 
 //get all products of seller
-router.get("/products/seller/all", isSeller, async (req, res) => {
+router.post("/products/seller/all", isSeller, async (req, res) => {
   //get the seller id from the authorization middleware, which is in the form of Bearer key.
-  const skip = (req.body.page - 1) * req.body.limit;
-  console.log(skip);
   const sellerIdFromAuthorizationMiddleware = req.userInfo._id;
   try {
     const sellerProductList = await Product.aggregate([
       {
         $match: {
           // match those products only whose sellerId is the logged seller.
-          sellerId: sellerIdFromAuthorizationMiddleware,
         },
-      },
-      {
-        $skip: skip,
-      },
-      {
-        $limit: req.body.limit,
       },
     ]);
     return res.status(200).send(sellerProductList);

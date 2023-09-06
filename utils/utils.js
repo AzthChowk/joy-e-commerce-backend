@@ -15,3 +15,8 @@ export const checkMongoId = async (req, res, next) => {
   }
   next();
 };
+
+export const checkIfInputIdIsMongoIdOrNot = (id) => {
+  const checkMongoIdResult = mongoose.Types.ObjectId.isValid(id);
+  return checkMongoIdResult;
+};

@@ -92,6 +92,10 @@ const productSchema = new mongoose.Schema({
   description: {
     type: String,
   },
+  addDate: {
+    type: Date,
+    default: Date.now(),
+  },
 });
 
 // create table

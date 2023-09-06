@@ -35,13 +35,13 @@ export const isBuyer = async (req, res, next) => {
   try {
     const userData = jwt.verify(token, process.env.JWT_ACCESS_TOKEN_SECRET);
     const findUser = await User.findOne({ _id: userData._id });
-    console.log(findUser);
     if (!findUser) {
       return res.status(400).send({ success: false, message: "Unauthorized." });
     }
     if (findUser.role !== "buyer") {
       return res.status(400).send({ success: false, message: "Unauthorized." });
     }
+    req.userInfo = findUser;
     next();
   } catch (error) {
     return res.status(400).send({ success: false, message: "Unauthorized." });
